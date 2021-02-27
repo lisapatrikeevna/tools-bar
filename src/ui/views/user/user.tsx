@@ -17,13 +17,16 @@ type propsType = {
 }
 const User = (props: propsType) => {
     const dispatch = useDispatch()
+    const admin = useSelector<AppRootStateType, string>(state => state.users.adminUid)
+    const curentUser = useSelector<AppRootStateType, string>(state => state.users.userid)
+    console.log(admin,' ',curentUser);
     let [groupName, setGroupName] = useState<string>('')
-    let [name, setName] = useState<string >(props.name? props.name : 'not a name')
-    let [email, setEmail] = useState<string >(props.email)
-    const changeEmail = (email:string) => {
+    let [name, setName] = useState<string>(props.name ? props.name : 'not a name')
+    let [email, setEmail] = useState<string>(props.email)
+    const changeEmail = (email: string) => {
         setEmail(email)
     }
-    const changeName = (name:string) => {
+    const changeName = (name: string) => {
         setName(name)
     }
     const removeUser = () => {
@@ -33,8 +36,8 @@ const User = (props: propsType) => {
     //     props.somefunction(props.id, title)
     // }, [props.id, props.somefunction])
     const update = () => {
-        let nickName= name
-        let payload = {email,nickName}
+        let nickName = name
+        let payload = {email, nickName}
         debugger
         dispatch(updateUserTC(props.uid, payload))
     }
@@ -53,18 +56,26 @@ const User = (props: propsType) => {
     return (
         <div key={props.uid} className={cl.userBox}>
             <p>uid:{props.uid}</p>
-            {/*<p>name:{name ? name : 'no name'}<input type="text"/></p>*/}
-            <p>name:<EditableSpan onChange={changeName} value={name}/></p>
             <p>date :{props.date}</p>
-            <p>email:<EditableSpan onChange={changeEmail} value={email}/></p>
+            {admin !== curentUser && <div>
+                <p>name:{name ? name : 'no name'}</p>
+                <p>email:{props.email}</p>
+            </div>}
+
+            {admin === curentUser &&
+            <div>
+                <p>email:<EditableSpan onChange={changeEmail} value={email}/></p>
+                <p>name:<EditableSpan onChange={changeName} value={name}/></p>
+                <hr/>
+                {/*<input type="text" value={groupName} placeholder={'add groupName'} onChange={onChaneNameGroup}/>*/}
+                {/*<button onClick={addToo}>add to group</button>*/}
+                <hr/>
+                <Button variant="contained" onClick={update}>update</Button>
+                <Button variant="contained" onClick={removeUser}>delete</Button>
+            </div>
+            }
             <p>group:{props.group ? props.group : 'no group'}</p>
             <p>listTasks:{props.listTasks ? props.listTasks : 'no tasks'}</p>
-            <hr/>
-            {/*<input type="text" value={groupName} placeholder={'add groupName'} onChange={onChaneNameGroup}/>*/}
-            {/*<button onClick={addToo}>add to group</button>*/}
-            <hr/>
-            <Button variant="contained"  onClick={update}>update</Button>
-            <Button variant="contained"  onClick={removeUser}>delete</Button>
         </div>
     );
 };

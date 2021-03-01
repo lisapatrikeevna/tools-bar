@@ -20,11 +20,9 @@ function App() {
         dispatch(authTC())
     },[dispatch])
     const status = useSelector(state => state.users.status)
-    // if (status) {
-    //     return <Redirect to={'/dashboard'}/>
-    // }else {
-    //     return <Redirect to={'/login'}/>
-    // }
+    if (!status) {return <Redirect to={'/login'}/>}
+    // else { return <Redirect to={'/groupsUsers'}/>}
+
   return (
     <div className="App">
         <React.Suspense fallback={'...loading'}>

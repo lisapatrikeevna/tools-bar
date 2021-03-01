@@ -3,3 +3,9 @@
     display: flex;
     justify-content: space-around;
 }
+.box{
+    /*width: 289px;*/
+    border: 2px solid rebeccapurple;
+    margin: 10px 0;
+    padding: 10px;
+}

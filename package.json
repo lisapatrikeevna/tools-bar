@@ -2,6 +2,7 @@
   "name": "tools-bar",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://lisapatrikeevna.github.io/tools-bar/",
   "dependencies": {
     "@coreui/icons-react": "^1.0.2",
     "@coreui/react": "^3.4.5",
@@ -22,6 +23,7 @@
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
     "firebase": "^8.2.9",
+    "gh-pages": "^3.1.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-redux": "^7.2.2",
@@ -38,7 +40,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [

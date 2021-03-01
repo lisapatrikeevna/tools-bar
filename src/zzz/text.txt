@@ -1,0 +1,56 @@
+npx create-react-app my-app --template typescript
+# or
+yarn create react-app my-app --template typescript
+
+npm install --save typescript @types/node @types/react @types/react-dom @types/jest
+# or
+yarn add typescript @types/node @types/react @types/react-dom @types/jest
+npm install @material-ui/core
+// with yarn
+yarn add @material-ui/core
+npm i @types/react-redux
+yarn add react-redux
+yarn add @types/redux
+npm i redux-thunk @types/redux-thunk
+yarn add react-router-dom @types/react-router-dom
+npm install firebase-admin --save
+npm install @material-ui/icons
+npm i @material-ui/types
+npm i recharts
+npm i clsx
+
+
+admin
+  .auth()
+  .getUser(uid)
+  .then((userRecord) => {
+    // See the UserRecord reference doc for the contents of userRecord.
+    console.log(`Successfully fetched user data: ${userRecord.toJSON()}`);
+  })
+  .catch((error) => {
+    console.log('Error fetching user data:', error);
+  });
+or
+  admin
+    .auth()
+    .getUserByEmail(email)
+    .then((userRecord) => {
+      // See the UserRecord reference doc for the contents of userRecord.
+      console.log(`Successfully fetched user data: ${userRecord.toJSON()}`);
+    })
+    .catch((error) => {
+      console.log('Error fetching user data:', error);
+    });
+or
+   admin
+     .auth()
+     .getUserByPhoneNumber(phoneNumber)
+     .then((userRecord) => {
+       // See the UserRecord reference doc for the contents of userRecord.
+       console.log(`Successfully fetched user data:  ${userRecord.toJSON()}`);
+     })
+     .catch((error) => {
+       console.log('Error fetching user data:', error);
+     });
+
+

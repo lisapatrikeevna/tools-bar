@@ -17,6 +17,7 @@ function App() {
 
     const dispatch = useDispatch()
     useEffect(()=>{
+        debugger
         dispatch(authTC())
     },[dispatch])
     const status = useSelector(state => state.users.status)

@@ -7,7 +7,6 @@ import {authTC} from "./bll/userReduser";
 // import Login from "./ui/views/pages/login/Login";
 
 
-
 // Pages
 const Login = React.lazy(() => import('./ui/views/pages/login/Login'));
 const Register = React.lazy(() => import('./ui/views/pages/register/Register'));
@@ -16,29 +15,29 @@ const Register = React.lazy(() => import('./ui/views/pages/register/Register'));
 function App() {
 
     const dispatch = useDispatch()
-    useEffect(()=>{
+    useEffect(() => {
         debugger
         dispatch(authTC())
-    },[dispatch])
+    }, [dispatch])
     const status = useSelector(state => state.users.status)
-   if (!status) {return <Redirect to={'/login'}/>}
-    // else { return <Redirect to={'/groupsUsers'}/>}
+    if (!status) {return <Redirect to={'/login'}/>}
+    // else {return <Redirect to={'/groupsUsers'}/>}
 
-  return (
-    <div className="App">
-        <React.Suspense fallback={'...loading'}>
-            <Switch>
-                <Route exact path="/login"  render={() => <Login/>} />
-                <Route exact path="/register" render={() => <Register />} />
-                <Route exact path="/dashboard" render=<Dashboard/>/>
-                {/*<Route exact path="/404" name="Page 404" render={props => <Page404 {...props}/>} />*/}
-                {/*<Route exact path="/500" name="Page 500" render={props => <Page500 {...props}/>} />*/}
-                {/*<Route path="/" name="Home" render={props => <TheLayout {...props}/>} />*/}
-                <Dashboard />
-            </Switch>
-        </React.Suspense>
-    </div>
-  );
+    return (
+        <div className="App">
+            <React.Suspense fallback={'...loading'}>
+                <Switch>
+                    <Route exact path="/login" render={() => <Login/>}/>
+                    <Route exact path="/register" render={() => <Register/>}/>
+                    <Route exact path="/dashboard" render={() => <Dashboard/>}/>
+                    {/*<Route exact path="/404" name="Page 404" render={props => <Page404 {...props}/>} />*/}
+                    {/*<Route exact path="/500" name="Page 500" render={props => <Page500 {...props}/>} />*/}
+                    {/*<Route path="/" name="Home" render={props => <TheLayout {...props}/>} />*/}
+                    <Dashboard/>
+                </Switch>
+            </React.Suspense>
+        </div>
+    )
 }
 
 export default App;

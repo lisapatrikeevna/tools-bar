@@ -25,10 +25,12 @@ const GroupsUsers = () => {
     const addUserToGroup=(uid:string)=>{
         // dispatch(setUserOnGroupTC(uid," idgoup"))
     }
+
     const allUsers = useSelector<AppRootStateType, Array<userType>>(state => state.users.users)
-    const user = allUsers.map(u => <User key={u.uid} group={u.group} name={u.name} date={u.tokensValidAfterTime}
+    const user = allUsers.map(u => <User key={u.uid} group={u.group} name={u.displayName} date={u.tokensValidAfterTime}
                                          email={u.email} listTasks={u.listTasks} uid={u.uid} removeUser={removeUser}
-                                         addUserToGroup={addUserToGroup}/>)
+                                         addUserToGroup={addUserToGroup} phoneNumber={u.phoneNumber}/>)
+    console.log(allUsers);
 
     return (
         <div>

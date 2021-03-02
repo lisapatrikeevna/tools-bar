@@ -10,8 +10,8 @@ type userType={
 type propsType = {
     id: string
     name: string
-    users: userType[]
-    // users: [{ uid: string, name:string }]
+    users?: userType[]
+    // users?: []
 }
 const Group = (props: propsType) => {
     const dispatch = useDispatch()
@@ -25,12 +25,12 @@ const Group = (props: propsType) => {
         <span >{u?.name}</span></div>)
     return (
         <div className={cl.box}>
-            <div><p>names group: {props.name}</p>
+            <div><><h5>names group:</h5><p> {props.name}</p></>
                 {/*<button onClick={update}>update</button>*/}
                 {/*<button onClick={deleteGroup}>delete</button>*/}
             </div>
-            {user && <p>list users:{user}</p>}
-            <p>content for group: ...</p>
+            {user && <><h5>list users:</h5><p>{user}</p></>}
+            <h5>content for group: ...</h5>
         </div>
     );
 };

@@ -30,7 +30,7 @@ export const Users = {
         // debugger
         return instance.post('api/createGroup', {id, name})
     },
-    updateUser(uid: string, payload: { email?: string, nickName?: string }) {
+    updateUser(uid: string, payload: { email?: string,phoneNumber?: string, nickName?: string }) {
         return instance.put(`userUpdate/${uid}`, {payload})
     },
     userRemove(uid: string) {

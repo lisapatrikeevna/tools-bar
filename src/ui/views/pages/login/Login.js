@@ -9,6 +9,8 @@ import {createUserTC, loginUserTC} from "../../../../bll/userReduser";
 import {useDispatch, useSelector} from "react-redux";
 
 const Login = () => {
+  console.log('login');
+  debugger
   const status = useSelector(state => state.users.status)
   const dispatch = useDispatch()
   let [email, setEmail] = useState('lisa15.08patrikeevana@gmail.com')
@@ -21,7 +23,8 @@ const Login = () => {
     setPassword('')
   }
   // if(status){return <Redirect to='/groupsUsers' />}
-  console.log(status);
+  console.log('login page:', status);
+
   return (
     <div className="c-app c-default-layout flex-row align-items-center">
       <CContainer>

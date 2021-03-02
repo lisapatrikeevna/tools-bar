@@ -9,6 +9,7 @@ import {EditableSpan} from "../../common/EditableSpan";
 type propsType = {
     uid: string
     name?: string | undefined
+    phoneNumber?:string
     date: string
     email: string
     group?: string | undefined
@@ -24,15 +25,11 @@ const User = (props: propsType) => {
     let [groupName, setGroupName] = useState<string>('')
     let [name, setName] = useState<string>(props.name ? props.name : 'not a name')
     let [email, setEmail] = useState<string>(props.email)
-    const changeEmail = (email: string) => {
-        setEmail(email)
-    }
-    const changeName = (name: string) => {
-        setName(name)
-    }
-    const removeUser = () => {
-        props.removeUser(props.uid)
-    }
+    let [phone, setPhone] = useState<string>(props.phoneNumber ? props.phoneNumber : 'not a phoneNumber')
+    const changeEmail = (email: string) => {setEmail(email)}
+    const changeName = (name: string) => {setName(name)}
+    const changePhone = (phone: string) => {setPhone(phone)}
+    const removeUser = () => {props.removeUser(props.uid)}
     // const changePropUser = useCallback((title: string) => {
     //     props.somefunction(props.id, title)
     // }, [props.id, props.somefunction])
@@ -51,7 +48,7 @@ const User = (props: propsType) => {
 
 
     return (
-        <div key={props.uid} className={cl.userBox}>
+        <div key={props.uid} className={cl.userBox} >
             {/*<p>uid:{props.uid}</p>*/}
 
             {admin !== curentUser && <div>
@@ -62,7 +59,8 @@ const User = (props: propsType) => {
             {admin === curentUser &&
             <div>
                 <p>email:<EditableSpan onChange={changeEmail} value={email}/></p>
-                <p>name:<EditableSpan onChange={changeName} value={name}/></p>
+                <p>name:<EditableSpan onChange={changeName} value={phone}/></p>
+                <p>phoneNumber :<EditableSpan onChange={changePhone} value={name}/></p>
                 <Button variant="contained" onClick={update}>update</Button>
                 <Button variant="contained" onClick={removeUser}>delete</Button>
                 {/*<hr/>*/}

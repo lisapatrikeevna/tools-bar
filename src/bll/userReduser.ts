@@ -25,6 +25,7 @@ type providerDataType = {
 }
 export type userType = {
     disabled: boolean
+    displayName: string
     email: string
     emailVerified: boolean
     metadata: { lastSignInTime: string, creationTime: string }
@@ -33,7 +34,8 @@ export type userType = {
     providerData: any
     tokensValidAfterTime: string
     uid: string
-    name?:string
+    photoURL?:string
+    phoneNumber?:string
     group?:string
     listTasks?: {}
 }

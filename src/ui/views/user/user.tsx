@@ -59,14 +59,18 @@ const styles={
 
             {admin === curentUser &&
             <div style={styles}>
-                <div><span>email:</span><EditableSpan onChange={changeEmail} value={email}/></div>
-                <div><span>name:</span><EditableSpan onChange={changeName} value={name}/></div>
-                <div><span>phoneNumber :</span><EditableSpan onChange={changePhone} value={phone}/></div>
+                <div className={cl.spanWrap}><span>email:</span><EditableSpan onChange={changeEmail} value={email}/></div>
+                <div className={cl.spanWrap}><span>name:</span><EditableSpan onChange={changeName} value={name}/></div>
+                <div className={cl.spanWrap}><span>phoneNumber :</span><EditableSpan onChange={changePhone} value={phone}/></div>
+                <div className={cl.spaceBetween}>
                 <Button variant="contained" onClick={update}>update</Button>
                 <Button variant="contained" onClick={removeUser}>delete</Button>
+                </div>
                 <hr/>
-                <TextField  variant='filled' type="text" value={groupName} placeholder={'add groupName'} onChange={onChaneNameGroup}/>
+                <div className={cl.spaceBetween}>
+                <TextField  variant='filled' size='small' type="text" value={groupName} placeholder={'add groupName'} onChange={onChaneNameGroup}/>
                 <Button onClick={addToo}>add to group</Button>
+                </div>
                 <hr/>
             </div>
             }

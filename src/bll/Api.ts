@@ -46,6 +46,9 @@ export const Users = {
     addUserOnGroup(id: string,uid:string,name:string) {
         return instance.put(`api/addUserOnGroup/${id},{uid,name}`)
     },
+    addUserData(id: string,uid:string,name:string) {
+        return instance.post(`api/addUserData,{}`)
+    },
 }
 export const Tasks = {
     getAllTasks() {

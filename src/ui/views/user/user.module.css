@@ -4,3 +4,10 @@
     margin: 10px 0;
     padding: 10px;
 }
+.spaceBetween{
+    display: flex;
+    justify-content: space-between;
+}
+.spanWrap{
+    margin: 5px 0;
+}

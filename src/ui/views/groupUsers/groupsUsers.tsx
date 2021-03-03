@@ -1,6 +1,6 @@
 import React, {ChangeEvent, useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {removeUserTC, setUserOnGroupTC, setUsersTC, userType} from "../../../bll/userReduser";
+import {removeUserTC, setUserOnGroupAC, setUserOnGroupTC, setUsersTC, userType} from "../../../bll/userReduser";
 import {AppRootStateType} from "../../../bll/store";
 import User from "../user/user";
 import Group from "../groups/group";
@@ -22,8 +22,10 @@ const GroupsUsers = () => {
         const action = removeUserTC(uid);
         dispatch(action);
     }, []);
-    const addUserToGroup=(uid:string)=>{
-        // dispatch(setUserOnGroupTC(uid," idgoup"))
+    const addUserToGroup=(uid:string,groupName:string)=>{
+        debugger
+        dispatch(setUserOnGroupAC({id:uid, groupName}))
+        // dispatch(setUserOnGroupTC({id:uid, groupName}))
     }
 
     const allUsers = useSelector<AppRootStateType, Array<userType>>(state => state.users.users)

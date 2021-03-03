@@ -27,7 +27,7 @@ const Group = (props: propsType) => {
         <div className={cl.box}>
             <div><><h5>names group:</h5><p> {props.name}</p></>
                 {/*<button onClick={update}>update</button>*/}
-                {/*<button onClick={deleteGroup}>delete</button>*/}
+                <button onClick={deleteGroup}>delete</button>
             </div>
             {user && <><h5>list users:</h5><p>{user}</p></>}
             <h5>content for group: ...</h5>

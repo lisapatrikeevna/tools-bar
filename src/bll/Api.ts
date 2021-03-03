@@ -41,8 +41,10 @@ export const Users = {
         return instance.post(`createUser`, {email, password, displayName: username})
     },
     groupRemove(id: string) {
-        debugger
         return instance.delete(`groupRemove/${id}`)
+    },
+    addUserOnGroup(id: string,uid:string,name:string) {
+        return instance.put(`api/addUserOnGroup/${id},{uid,name}`)
     },
 }
 export const Tasks = {

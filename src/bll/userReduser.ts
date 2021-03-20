@@ -1,30 +1,22 @@
 import {Dispatch} from "redux";
-import {Users} from "./Api";
-import * as uuid from 'uuid';
+import {FireBaseResponse, GroupsApi, GroupType, Users, UserType} from "./Api";
 import firebase from "firebase";
 import {app} from "../index";
-import {log} from "util";
-// import {listAllUsers} from "./Api";
+import {getGroupsTC, groupUsersType, setGroupsACType} from "./groupReduser";
 
 type setUsersACType = ReturnType<typeof setUsersAC>
 type authACType = ReturnType<typeof authAC>
-type setGroupsACType = ReturnType<typeof setGroupsAC>
-type addGroupsACType = ReturnType<typeof addGroupsAC>
-type deleteGroupsACType = ReturnType<typeof deleteGroupsAC>
-type setUserOnGroupACType = ReturnType<typeof setUserOnGroupAC>
+type setUserAdditionalInformationACType = ReturnType<typeof setUserAdditionalInformationAC>
 type setUserRecordACType = ReturnType<typeof setUserRecordAC>
 type loginUserACType = ReturnType<typeof loginUserAC>
-type actionType = setUsersACType | setGroupsACType | addGroupsACType | deleteGroupsACType | setUserOnGroupACType |
-    setUserRecordACType | authACType | loginUserACType
-export type  groupUsersType = {
-    uid: string
-    userName?: string
-}
-type providerDataType = {
-    0: { uid: string, email: string, providerId: string }
-    length: number
-    tokensValidAfterTime: string
-}
+type actionType = setUsersACType | setUserAdditionalInformationACType
+    | setUserRecordACType | authACType | loginUserACType | setGroupsACType
+
+// type providerDataType = {
+//     0: { uid: string, email: string, providerId: string }
+//     length: number
+//     tokensValidAfterTime: string
+// }
 export type userType = {
     disabled: boolean
     displayName: string
@@ -38,16 +30,12 @@ export type userType = {
     uid: string
     photoURL?: string
     phoneNumber?: string
-    group?: string
+    group: string | null
     listTasks?: {}
 }
-export type groupType = {
-    id: string
-    group: string
-    users: groupUsersType[]
-}
+
 type initStateType = {
-    groups: groupType[]
+    groups: GroupType[]
     users: Array<userType>
     status: boolean
     userRecord: string
@@ -56,6 +44,7 @@ type initStateType = {
     email: string
     userid: string
 }
+
 let initState: initStateType = {
     groups: [],
     users: [],
@@ -75,38 +64,26 @@ export const userReducer = (state = initState, action: actionType) => {
             return {...state, status: action.payload}
         case "USERS/SET-USER-RECORD":
             return {...state, userRecord: action.payload, status: true}
-        case 'USERS/SET-GROUPS':
+        case 'GROUP/SET-GROUPS':
             return {...state, groups: action.payload}
-        case "USERS/SET-USER-ON-GROUP": {
-            // debugger
-            console.log('groups: ', state.groups);
+        case 'USERS/SET-USERS':
+            return {...state, users: action.payload}
+        case "USERS/SET-USER-INFORMATION": {
             return {
                 ...state,
-                // users: state.users.map(u=> {
-                //   if(u.uid === action.payload.id){
-                //       debugger
-                //    if(  state.groups.map(g=>g.group===action.payload.groupName?
-                //        {...g, users: state.groups.users.map(user=> {action.payload.id})}
-                //        : g)) {
-                //        return {}
-                //    }
-                //   }else return u
-                // }),
-                groups: state.groups.map(g => {
-                    if (g.group === action.payload.groupName) return {
-                        ...g, users: [...g.users, action.payload.id]
+                users: state.users.map(u => {
+                    const currentUser = action.payload.find((currentUser) => u.uid === currentUser.id)
+                    if (currentUser) {
+                        const group = state.groups.find(group => group.id === currentUser.data.user.id)
+                        return {
+                            ...u, group: group?.data.group, listTasks: currentUser.data.user.listTasks
+                        }
+                    } else {
+                        return u
                     }
-                    else return g
                 })
             }
         }
-        case 'USERS/SET-USERS':
-            // console.log(action.payload)
-            return {...state, users: action.payload}
-        case 'USERS/ADD-GROUP':
-            return {...state, groups: [...state.groups, action.payload]}
-        case 'USERS/DELETE-GROUP':
-            return {...state, groups: [state.groups.filter(g => g.id !== action.payload)]}
         default:
             return {...state}
     }
@@ -114,21 +91,14 @@ export const userReducer = (state = initState, action: actionType) => {
 export const authAC = (payload: boolean) => ({type: 'USERS/AUTH', payload} as const)
 export const setUsersAC = (payload: any) => ({type: 'USERS/SET-USERS', payload} as const)
 export const setUserRecordAC = (payload: string) => ({type: 'USERS/SET-USER-RECORD', payload} as const)
-export const setUserOnGroupAC = (payload: { id: string, groupName: string }) => ({
-    type: 'USERS/SET-USER-ON-GROUP', payload
-} as const)
-export const setGroupsAC = (payload: any) => ({type: 'USERS/SET-GROUPS', payload} as const)
-export const addGroupsAC = (payload: any) => ({type: 'USERS/ADD-GROUP', payload} as const)
-export const deleteGroupsAC = (payload: any) => ({type: 'USERS/DELETE-GROUP', payload} as const)
+export const setUserAdditionalInformationAC = (payload: Array<FireBaseResponse<UserType>>) => ({
+    type: 'USERS/SET-USER-INFORMATION', payload} as const)
 export const loginUserAC = (email: string, userid: string) => ({type: 'USERS/LOGIN_USER', email, userid} as const)
 
+//TC
 export const authTC = () => (dispatch: Dispatch) => {
-    // Users.auth()
-    //     .then(res=>{
-    //     dispatch(authAC(res))
-    // })
     app.auth().onAuthStateChanged(function (user: any) {
-        console.log('onAuthStateChanged :', user);
+        // console.log('onAuthStateChanged :', user);
         if (user) {
             dispatch(authAC(true))
             dispatch(loginUserAC(user.email, user.uid))
@@ -143,12 +113,49 @@ export const removeUserTC = (uid: string) => (dispatch: any) => {
         console.log(res);
     })
 }
-export const removeGroupsTC = (id: string) => (dispatch: any) => {
-    Users.groupRemove(id).then(res => {
-        dispatch(getGroupsTC())
+export const updateUserTC = (uid: string, payload: any) => (dispatch: any) => {
+    Users.updateUser(uid, payload).then(res => {
+        dispatch(setUsersTC())
         console.log(res);
     })
 }
+export const createUserTC = (email: string, password: string, username: string) => (dispatch: any) => {
+    Users.createUser(email, password, username).then(res => {
+        dispatch(setUserRecordAC(res.data))
+        if (res.data.message) {
+            alert(res.data.message)
+        }
+    })
+}
+export const setUsersTC = () => async (dispatch: Dispatch) => {
+    try {
+        const users = await Users.getAllUsers()
+        const infoUser = await Users.getAllUsersFirestore()
+        dispatch(setUsersAC(users.data))
+        dispatch(setUserAdditionalInformationAC(infoUser))
+    } catch (e) {
+        console.log(e)
+    }
+}
+export const getAllUsersFirestoreTC = () => (dispatch: Dispatch) => {
+    Users.getAllUsersFirestore().then(res => {
+        // console.log('Users.getAllUsersFirestore' + res);
+        dispatch(setUserAdditionalInformationAC(res))
+    })
+}
+export const setUserOnGroupTC = (id: string, uid: string, userName: string, user: groupUsersType) =>
+    (dispatch: any) => {
+    debugger
+        // Users.addUserOnGroup(id, uid, userName).then(res => {
+        GroupsApi.addUserOnGroup(id, user).then(res => {
+            dispatch(getGroupsTC())
+        })
+        Users.addUserData(uid, id, userName).then(res => {
+            // console.log("setUserOnGroupTC: ", res);
+            debugger
+            dispatch(getAllUsersFirestoreTC())
+        })
+    }
 export const loginUserTC = (email: string, password: string) => (dispatch: any) => {
     app.auth().signInWithEmailAndPassword(email, password)
         .then((res) => {
@@ -167,51 +174,8 @@ export const signOutTC = () => (dispatch: Dispatch) => {
         console.log(error);
     });
 }
-export const updateUserTC = (uid: string, payload: any) => (dispatch: any) => {
-    Users.updateUser(uid, payload).then(res => {
-        dispatch(setUsersTC())
-        console.log(res);
-    })
-}
-export const createUserTC = (email: string, password: string, username: string) => (dispatch: any) => {
-    Users.createUser(email, password, username).then(res => {
-        dispatch(setUserRecordAC(res.data))
-        if (res.data.message) {
-            alert(res.data.message)
-        }
-    })
-}
-export const setUsersTC = () => (dispatch: Dispatch) => {
-    Users.getAllUsers()
-        .then(res => {
-                dispatch(setUsersAC(res.data))
-            }
-        ).catch(er =>
-        alert(er)
-    )
-}
-export const getGroupsTC = () => (dispatch: Dispatch) => {
-    // Users.getGroupsAll()
-    Users.getGroups()
-        .then(res => {
-                console.log(res);
-                dispatch(setGroupsAC(res))
-            }
-        )
-}
-export const addGroupsTC = (group: string) => (dispatch: any) => {
-    let id = uuid.v1()
-    Users.addGroup(id, group)
-        .then(res => {
-            dispatch(getGroupsTC())
-            console.log(res);
-        })
-}
-export const setUserOnGroupTC = (id: string, uid: string, userName: string) => (dispatch: any) => {
-    Users.addUserOnGroup(id, uid, userName).then(res => {
-        dispatch(getGroupsTC())
-    })
-}
+
+
 // export const addItemTC = ( group: string) => (dispatch: Dispatch) => {
 // // export const addGroupsTC = (id: string, group: string) => (dispatch: Dispatch) => {
 //     debugger

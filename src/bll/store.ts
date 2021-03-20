@@ -6,11 +6,12 @@ import {tasksReducer} from "./tasksReduser";
 import {todolistsReducer} from "./todolists-reducer";
 import {appReducer} from "./app-reducer";
 import {authReducer} from "./authReducer";
+import { groupReducer } from './groupReduser';
 
 const rootReducer = combineReducers({
+    groups: groupReducer,
     users: userReducer,
     nav: changeStateReducer,
-    //login: loginReducer
     tasks: tasksReducer,
     todoList: todolistsReducer,
     app: appReducer,
@@ -19,5 +20,6 @@ const rootReducer = combineReducers({
 
 const store = createStore(rootReducer, applyMiddleware(thunkMiddleware));
 export type AppRootStateType = ReturnType<typeof rootReducer>;
-
+//@ts-ignore
+window.store=store
 export default store

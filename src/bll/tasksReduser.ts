@@ -1,7 +1,7 @@
 import {Dispatch} from "redux";
-import {TaskPriorities, TaskStatuses, TaskType, UpdateTaskModelType, Users} from "./Api";
+import {TaskPriorities, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelType, Users} from "./Api";
 import {AddTodolistActionType, RemoveTodolistActionType, SetTodolistsActionType} from "./todolists-reducer";
-import {SetAppErrorActionType, SetAppStatusActionType} from "./app-reducer";
+import {SetAppErrorActionType, setAppStatusAC, SetAppStatusActionType} from "./app-reducer";
 
 
 export type UpdateDomainTaskModelType = {
@@ -41,6 +41,7 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
                     .map(t => t.id === action.taskId ? {...t, ...action.model} : t)
             }
         case 'ADD-TODOLIST':
+            // @ts-ignore
             return {...state, [action.todolist.id]: []}
         case 'REMOVE-TODOLIST':
             const copyState = {...state}
@@ -71,15 +72,15 @@ export const setTasksAC = (tasks: Array<TaskType>, todolistId: string) =>
     ({type: 'SET-TASKS', tasks, todolistId} as const)
 
 // thunks
-// export const fetchTasksTC = (todolistId: string) => (dispatch: Dispatch<ActionsType | SetAppStatusActionType>) => {
-//     dispatch(setAppStatusAC('loading'))
-//     todolistsAPI.getTasks(todolistId)
-//         .then((res) => {
-//             const tasks = res.data.items
-//             dispatch(setTasksAC(tasks, todolistId))
-//             dispatch(setAppStatusAC('succeeded'))
-//         })
-// }
+export const fetchTasksTC = (todolistId: string) => (dispatch: Dispatch<ActionsType | SetAppStatusActionType>) => {
+    dispatch(setAppStatusAC('loading'))
+    todolistsAPI.getTasks(todolistId)
+        .then((res) => {
+            const tasks = res.data.items
+            dispatch(setTasksAC(tasks, todolistId))
+            dispatch(setAppStatusAC('succeeded'))
+        })
+}
 // export const removeTaskTC = (taskId: string, todolistId: string) => (dispatch: Dispatch<ActionsType>) => {
 //     todolistsAPI.deleteTask(todolistId, taskId)
 //         .then(res => {

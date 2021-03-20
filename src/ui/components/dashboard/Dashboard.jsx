@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import clsx from 'clsx';
 import {makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -20,10 +20,15 @@ import {mainListItems, secondaryListItems} from './listItems';
 import {Switch, Route, Redirect, NavLink} from "react-router-dom"
 import Button from "@material-ui/core/Button";
 import {useDispatch} from "react-redux";
-import {signOutTC} from "../../../bll/userReduser";
+import {setUsersTC, signOutTC} from "../../../bll/userReduser";
 import HomeIcon from '@material-ui/icons/Home';
+import Groups from "../../views/groups/groups";
+import {PATH} from "../../route";
+import Users from "../../views/users/users";
+import Page404 from "../../views/pages/page404/Page404";
+import GroupPage from "../../views/groups/groupPage";
+import {getGroupsTC} from "../../../bll/groupReduser";
 
-// import Route from "react-router-dom";
 
 function Copyright() {
     return (
@@ -100,7 +105,7 @@ const useStyles = makeStyles((theme) => ({
     appBarSpacer: theme.mixins.toolbar,
     content: {
         flexGrow: 1,
-        height: '100vh',
+        // height: '100vh',
         overflow: 'auto',
     },
     container: {
@@ -126,6 +131,7 @@ const GroupsUsers = React.lazy(() => import('../../views/groupUsers/groupsUsers'
 
 export default function Dashboard() {
     const dispatch = useDispatch()
+
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
     const handleDrawerOpen = () => {
@@ -155,7 +161,7 @@ export default function Dashboard() {
                             <NotificationsIcon/>
                         </Badge>
                     </IconButton>
-                    <Button onClick={submitSignOut}>signin</Button>
+                    <Button onClick={submitSignOut}>sign out</Button>
                     <NavLink to={'https://lisapatrikeevna.github.io/dragan-2/'} title={'to site'}> <HomeIcon/></NavLink>
                 </Toolbar>
             </AppBar>
@@ -177,8 +183,12 @@ export default function Dashboard() {
                     <React.Suspense fallback={'...loading'}>
                         <Switch>
                             {/*<Route path="/"  render={props => <Starting {...props}/>} />*/}
+                            <Route exact path={PATH.GROUPS} render={() => <Groups/>}/>
+                            <Route exact path={PATH.USERS} render={() => <Users/>}/>
                             <Route path="/starting" render={props => <Starting {...props}/>}/>
-                            <Route path="/groupsUsers" render={props => <GroupsUsers {...props}/>}/>
+                            {/*<Route path="/groupsUsers" render={props => <GroupsUsers {...props}/>}/>*/}
+                            <Route exact path={PATH.PAGEGROUP.path} render={() => <GroupPage />}/>
+                            <Route exact path={PATH.ERROR404} render={() => <Page404/>}/>
                             {/*    /!*<Route exact path="/404" name="Page 404" render={props => <Page404 {...props}/>} />*!/*/}
                             {/*    /!*<Route exact path="/500" name="Page 500" render={props => <Page500 {...props}/>} />*!/*/}
                         </Switch>

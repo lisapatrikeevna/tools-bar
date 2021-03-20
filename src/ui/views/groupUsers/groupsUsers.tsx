@@ -1,44 +1,22 @@
-import React, {ChangeEvent, useCallback, useEffect, useState} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {removeUserTC, setUserOnGroupAC, setUserOnGroupTC, setUsersTC, userType} from "../../../bll/userReduser";
-import {AppRootStateType} from "../../../bll/store";
-import User from "../user/user";
-import Group from "../groups/group";
-import cl from './groupUsers.module.css';
+import React, { useEffect} from 'react';
+import {useDispatch} from "react-redux";
 import Groups from "../groups/groups";
+import Users from "../users/users";
 
 const GroupsUsers = () => {
     const dispatch = useDispatch()
     useEffect(() => {
         // debugger
-        dispatch(setUsersTC())
         // const db = admin.database();
         // const ref = db.ref("restricted_access/secret_document");
         // ref.once("value", function(snapshot) {
         //     console.log(snapshot.val());
         // });
     }, [dispatch])
-    const removeUser = useCallback(function (uid: string) {
-        const action = removeUserTC(uid);
-        dispatch(action);
-    }, []);
-    const addUserToGroup=(uid:string,groupName:string)=>{
-        debugger
-        dispatch(setUserOnGroupAC({id:uid, groupName}))
-        // dispatch(setUserOnGroupTC({id:uid, groupName}))
-    }
-
-    const allUsers = useSelector<AppRootStateType, Array<userType>>(state => state.users.users)
-    const user = allUsers.map(u => <User key={u.uid} group={u.group} name={u.displayName} date={u.tokensValidAfterTime}
-                                         email={u.email} listTasks={u.listTasks} uid={u.uid} removeUser={removeUser}
-                                         addUserToGroup={addUserToGroup} phoneNumber={u.phoneNumber}/>)
-    console.log(allUsers);
 
     return (
         <div>
-            <h5>all users: </h5>
-            <p>пс. чтоб обновить поля( email и name ) даблклик и апдейт</p>
-            <div className={cl.wrap}>{user}</div>
+            <Users/>
             <Groups/>
         </div>
     );

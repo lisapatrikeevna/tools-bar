@@ -23,7 +23,7 @@ const Login = () => {
     setPassword('')
   }
   // if(status){return <Redirect to='/groupsUsers' />}
-  console.log('login page:', status);
+  // console.log('login page:', status);
 
   return (
     <div className="c-app c-default-layout flex-row align-items-center">

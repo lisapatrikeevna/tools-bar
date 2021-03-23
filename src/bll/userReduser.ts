@@ -113,6 +113,12 @@ export const removeUserTC = (uid: string) => (dispatch: any) => {
         console.log(res);
     })
 }
+export const removeGroupFromUserDataTC = (uid: string) => (dispatch: any) => {
+    Users.deleteGroupFromUserData(uid).then(res => {
+        dispatch(setUsersTC())
+        console.log(res);
+    })
+}
 export const updateUserTC = (uid: string, payload: any) => (dispatch: any) => {
     Users.updateUser(uid, payload).then(res => {
         dispatch(setUsersTC())
@@ -145,14 +151,11 @@ export const getAllUsersFirestoreTC = () => (dispatch: Dispatch) => {
 }
 export const setUserOnGroupTC = (id: string, uid: string, userName: string, user: groupUsersType) =>
     (dispatch: any) => {
-    debugger
-        // Users.addUserOnGroup(id, uid, userName).then(res => {
         GroupsApi.addUserOnGroup(id, user).then(res => {
             dispatch(getGroupsTC())
         })
         Users.addUserData(uid, id, userName).then(res => {
             // console.log("setUserOnGroupTC: ", res);
-            debugger
             dispatch(getAllUsersFirestoreTC())
         })
     }

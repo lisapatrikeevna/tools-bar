@@ -7,16 +7,21 @@ const instance = axios.create({
     baseURL: 'http://localhost:7563/',
 })
 
+
+export type GroupDataType = {
+    group: string
+    users: groupUsersType[]
+    todoLists: Array<any>
+}
+export type GroupType = {
+    data: GroupDataType
+    id: string
+}
 export type userFirestoreType = {
     id?: string
     name: string
     uid: string
     listTasks?: any
-}
-export type GroupDataType = {
-    group: string
-    users: groupUsersType[]
-    todoLists?: Array<string>
 }
 export type UserType = {
     user: userFirestoreType
@@ -25,15 +30,10 @@ export type FireBaseResponse<T> = {
     id: string
     data: T
 }
-export type GroupType = {
-    data: GroupDataType
-    id: string
-}
 export const GroupsApi = {
     getGroups() {
         return instance.get<Array<GroupType>>('api/getGroups').then(r => r.data)
     },
-    // addGroup(id: string, name: string,idGrUser:string,users:string) {
     addGroup(id: string, name: string) {
         return instance.post('api/createGroup', {id, name})
     },
@@ -42,12 +42,22 @@ export const GroupsApi = {
     },
     getGroupById(id: string) {
         return instance.get(`api/getGroupById/${id}`).then(r => r.data)
+        // return instance.get<GroupType>(`api/getGroupById/${id}`).then(r => r.data)
     },
     // addUserOnGroup(id: string,uid:string,name:string) {
     addUserOnGroup(id: string, user: groupUsersType) {
         debugger
         // return instance.post(`api/addUserOnGroup/${id}`,{uid,name})
         return instance.post(`api/addUserOnGroup/${id}`, {user})
+    },
+    addTodoOnGroup(id: string, todoId: string) {
+        debugger
+        // return instance.post(`api/addUserOnGroup/${id}`,{uid,name})
+        return instance.post(`api/addTodolistsOnGroup/${id}`, {todoId})
+    },
+    removeUserFromGroup(id: string,uid: string){
+        debugger
+        return instance.delete(`api/deleteUserFromGroup/${id}/${uid}`)
     },
 }
 export const Users = {
@@ -65,15 +75,16 @@ export const Users = {
         return instance.put(`userUpdate/${uid}`, {payload})
     },
     userRemove(uid: string) {
-        // @ts-ignore
         return instance.delete(`userRemove/${uid}`)
     },
     createUser(email: string, password: string, username: string) {
         return instance.post(`createUser`, {email, password, displayName: username})
     },
-
     addUserData(uid: string, id: string, name: string) {
         return instance.post(`api/addUserData`, {uid, id, name})
+    },
+    deleteGroupFromUserData(uid: string) {
+        return instance.delete(`api/deleteGroupFromUserData/${uid}`)
     },
 }
 export type TodoslistType = {
@@ -86,17 +97,15 @@ export type TodoslistType = {
 }
 export const todolistsAPI = {
     getTodolists() {
-        const promise = instance.get<TodoslistType[]>('api/getTodolists').then(r => r.data);
-        return promise;
+        return  instance.get<TodoslistType[]>('api/getTodolists').then(r => r.data);
     },
     createTodolist(id:string,title:string,addedDate:string,order:number) {
         debugger
-        const promise = instance.post<ResponseType<{ item: TodoslistType }>>('api/todoLists/create', {id,title,addedDate,order});
-        return promise;
+        return  instance.post<ResponseType<{ item: TodoslistType }>>('api/todoLists/create', {id,title,addedDate,order});
     },
     deleteTodolist(id: string) {
-        const promise = instance.delete<ResponseType>(`api/deleteTodolist/${id}`);
-        return promise;
+        // debugger
+        return instance.delete<ResponseType>(`api/deleteTodolist/${id}`);
     },
     // updateTodolist(id: string, title: string) {
     //     const promise = instance.put<ResponseType>(`api/getTodolists/${id}`, {title: title});
@@ -148,10 +157,10 @@ export type myResponseType = {
 }
 
 export type ResponseType<D = {}> = {
-    resultCode: number
+    // resultCode: number
     messages: Array<string>
     fieldsErrors: Array<string>
-    data: D
+    data?: D
 }
 
 export enum TaskStatuses {

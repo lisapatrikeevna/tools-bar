@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import {makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,17 +17,18 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import {mainListItems, secondaryListItems} from './listItems';
-import {Switch, Route, Redirect, NavLink} from "react-router-dom"
+import {Switch, Route, NavLink} from "react-router-dom"
 import Button from "@material-ui/core/Button";
 import {useDispatch} from "react-redux";
-import {setUsersTC, signOutTC} from "../../../bll/userReduser";
+import { signOutTC} from "../../../bll/userReduser";
 import HomeIcon from '@material-ui/icons/Home';
 import Groups from "../../views/groups/groups";
 import {PATH} from "../../route";
 import Users from "../../views/users/users";
 import Page404 from "../../views/pages/page404/Page404";
 import GroupPage from "../../views/groups/groupPage";
-import {getGroupsTC} from "../../../bll/groupReduser";
+import LinearProgress from "@material-ui/core/LinearProgress";
+import {SmallAlert} from "../common/SmalAlert";
 
 
 function Copyright() {
@@ -179,6 +180,7 @@ export default function Dashboard() {
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer}/>
+                {/*<LinearProgress/>*/}
                 <Container maxWidth="lg" className={classes.container}>
                     <React.Suspense fallback={'...loading'}>
                         <Switch>
@@ -192,6 +194,7 @@ export default function Dashboard() {
                             {/*    /!*<Route exact path="/404" name="Page 404" render={props => <Page404 {...props}/>} />*!/*/}
                             {/*    /!*<Route exact path="/500" name="Page 500" render={props => <Page500 {...props}/>} />*!/*/}
                         </Switch>
+                        <SmallAlert/>
                     </React.Suspense>
                     <Box pt={4}>
                         <Copyright/>

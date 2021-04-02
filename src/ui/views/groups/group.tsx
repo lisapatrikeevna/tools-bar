@@ -1,6 +1,5 @@
 import React, {useCallback} from 'react';
 import {useDispatch} from "react-redux";
-import cl from "../groupUsers/groupUsers.module.css";
 import {NavLink} from "react-router-dom";
 import {PATH} from "../../route";
 import {groupUsersType, removeGroupsTC} from "../../../bll/groupReduser";
@@ -14,12 +13,9 @@ type propsType = {
     id: string
     name: string
     users?: groupUsersType[]
-    // users?: []
 }
 const Group = React.memo((props: propsType) => {
     const dispatch = useDispatch()
-    const update = () => {
-    }
     const deleteGroup = useCallback(() => {
         dispatch(removeGroupsTC(props.id))
     }, [props.id])
@@ -32,7 +28,6 @@ const Group = React.memo((props: propsType) => {
                 <TableCell align="right">
                     {props.name}
                 </TableCell>
-                {/*<TableCell align="right">{props.name}</TableCell>*/}
                 <TableCell align="right">
                     <NavLink to={PATH.PAGEGROUP.getUrl(props.id)}><BorderColorIcon/></NavLink>
                     <DeleteIcon onClick={deleteGroup} color='primary'/>

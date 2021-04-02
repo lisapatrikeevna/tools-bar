@@ -62,8 +62,6 @@ const Groups = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            {/*<div className={cl.wrap}>{group}</div>*/}
-            {/*<DenseTable/>*/}
         </>
     );
 };

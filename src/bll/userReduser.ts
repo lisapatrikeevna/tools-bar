@@ -30,7 +30,8 @@ export type userType = {
     uid: string
     photoURL?: string
     phoneNumber?: string
-    group: string | null
+    groupName: string | null
+    groupId: string | null
     listTasks?: {}
 }
 
@@ -74,9 +75,10 @@ export const userReducer = (state = initState, action: actionType) => {
                 users: state.users.map(u => {
                     const currentUser = action.payload.find((currentUser) => u.uid === currentUser.id)
                     if (currentUser) {
+                        debugger
                         const group = state.groups.find(group => group.id === currentUser.data.user.id)
                         return {
-                            ...u, group: group?.data.group, listTasks: currentUser.data.user.listTasks
+                            ...u, groupName: group?.data.group,groupId:currentUser.data.user.id, listTasks: currentUser.data.user.listTasks
                         }
                     } else {
                         return u

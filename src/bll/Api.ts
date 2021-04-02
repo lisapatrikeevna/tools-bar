@@ -1,6 +1,5 @@
 import axios from 'axios'
 import {groupUsersType} from "./groupReduser";
-import {TodolistType} from "./todolists-reducer";
 
 const instance = axios.create({
     // baseURL: 'https://dragan.lisa15.ru/',
@@ -42,22 +41,18 @@ export const GroupsApi = {
     },
     getGroupById(id: string) {
         return instance.get(`api/getGroupById/${id}`).then(r => r.data)
-        // return instance.get<GroupType>(`api/getGroupById/${id}`).then(r => r.data)
     },
-    // addUserOnGroup(id: string,uid:string,name:string) {
     addUserOnGroup(id: string, user: groupUsersType) {
-        debugger
-        // return instance.post(`api/addUserOnGroup/${id}`,{uid,name})
         return instance.post(`api/addUserOnGroup/${id}`, {user})
     },
     addTodoOnGroup(id: string, todoId: string) {
-        debugger
-        // return instance.post(`api/addUserOnGroup/${id}`,{uid,name})
         return instance.post(`api/addTodolistsOnGroup/${id}`, {todoId})
     },
-    removeUserFromGroup(id: string,uid: string){
-        debugger
-        return instance.delete(`api/deleteUserFromGroup/${id}/${uid}`)
+    removeUserFromGroup(id: string,{uid, name}: groupUsersType){
+        return instance.put(`api/deleteUserFromGroup/${id}`, {uid,name})
+    },
+    removeTodoFromGroup(id: string,todoId:string){
+        return instance.put(`api/deleteTodoListFromGroup/${id}`, {todoId})
     },
 }
 export const Users = {
@@ -71,7 +66,6 @@ export const Users = {
         return instance.get('auth')
     },
     updateUser(uid: string, payload: { email?: string, phoneNumber?: string,disabled?:false, nickName?: string }) {
-        debugger
         return instance.put(`userUpdate/${uid}`, {payload})
     },
     userRemove(uid: string) {
@@ -84,7 +78,7 @@ export const Users = {
         return instance.post(`api/addUserData`, {uid, id, name})
     },
     deleteGroupFromUserData(uid: string) {
-        return instance.delete(`api/deleteGroupFromUserData/${uid}`)
+        return instance.put(`api/deleteGroupFromUserData/${uid}`)
     },
 }
 export type TodoslistType = {
@@ -100,30 +94,38 @@ export const todolistsAPI = {
         return  instance.get<TodoslistType[]>('api/getTodolists').then(r => r.data);
     },
     createTodolist(id:string,title:string,addedDate:string,order:number) {
-        debugger
         return  instance.post<ResponseType<{ item: TodoslistType }>>('api/todoLists/create', {id,title,addedDate,order});
     },
     deleteTodolist(id: string) {
-        // debugger
         return instance.delete<ResponseType>(`api/deleteTodolist/${id}`);
     },
-    // updateTodolist(id: string, title: string) {
-    //     const promise = instance.put<ResponseType>(`api/getTodolists/${id}`, {title: title});
-    //     return promise;
-    // },
+
     getTasks(todolistId: string) {
         return instance.get<GetTasksResponse>(`api/getTodolists/${todolistId}/tasks`);
     },
-    deleteTask(todolistId: string, taskId: string) {
-        return instance.delete<ResponseType>(`api/getTodolists/${todolistId}/tasks/${taskId}`);
+    // deleteTask(taskId: string,todolistId: string) {
+    deleteTask(todolistId: string,task: TaskType) {
+        //!!!!!!!
+        debugger
+        return instance.put<ResponseType>(`api/Todolists/${todolistId}/removeTasks`,task);
     },
-    createTask(todolistId: string, taskTitile: string) {
-        return instance.post<ResponseType<{ item: TaskType }>>(`api/todoLists/create/${todolistId}/tasks`, {title: taskTitile});
+    createTask(todolistId: string) {
+        // debugger
+        return instance.post<ResponseType>(`api/todoLists/create/${todolistId}/tasks`);
     },
-    updateTask(todolistId: string, taskId: string, model: UpdateTaskModelType) {
-        return instance.put<ResponseType<TaskType>>(`todo-lists/${todolistId}/tasks/${taskId}`, model);
+    addTask(todolistId: string, { description,title, status, priority, startDate, deadline, id, todoListId, order, addedDate}:TaskType) {
+       // debugger
+        return instance.post<firebasePostResponseType>(`api/todoLists/add/${todolistId}/tasks`, {description,title,  status, priority, startDate, deadline, id, todolistId, order, addedDate});
     },
 
+//dont used
+    updateTask(todolistId: string, taskId: string, model: UpdateTaskModelType) {
+        return instance.put<ResponseType<TaskType>>(`todo-lists/${todolistId}/udateTasks/${taskId}`, model);
+    },
+    updateTodolist(id: string, title: string) {
+        const promise = instance.put<ResponseType>(`api/getTodolists/${id}`, {title: title});
+        return promise;
+    },
 }
 export const Tasks = {
     getAllTasks() {
@@ -136,11 +138,14 @@ export const Tasks = {
         // const promise = instance.get('users');
         // return promise;
         // debugger
-        return instance.get('/api/get')
+        return instance.get('api/get')
     },
     addTodo(id: string, name: string) {
         debugger
         return instance.post('api/todoLists/create', {id, name})
+    },
+    taskRemove(id:string){
+        return instance.delete(`taskRemove/${id}`)
     }
 }
 
@@ -199,9 +204,14 @@ export type UpdateTaskModelType = {
     deadline: string
 }
 type GetTasksResponse = {
-    error: string | null
-    totalCount: number
-    items: TaskType[]
+    // error: string | null
+    // totalCount: number
+    // task: TaskType[]
+}
+type firebasePostResponseType = {
+    data:string
+    status:number
+    statusText:string
 }
 //import * as admin from 'firebase-admin';
 //const serviceAccount = require("../fir-silky-firebase-adminsdk-6l12p-2bc5e41df4.json");

@@ -1,0 +1,2 @@
+(this["webpackJsonptools-bar"]=this["webpackJsonptools-bar"]||[]).push([[4],{802:function(t,s,c){"use strict";c.r(s);var e=c(1),b=c(17),n=c(175),a=c(176),o=c(5);s.default=function(){var t=Object(b.b)();return Object(e.useEffect)((function(){}),[t]),Object(o.jsxs)("div",{children:[Object(o.jsx)(a.a,{}),Object(o.jsx)(n.a,{})]})}}}]);
+//# sourceMappingURL=4.1f6378fb.chunk.js.map

@@ -3,8 +3,8 @@ import {groupUsersType} from "./groupReduser";
 import {UpdatedTaskType} from "./tasksReduser";
 
 const instance = axios.create({
-    // baseURL: 'https://dragan.lisa15.ru/',
-    baseURL: 'http://localhost:7563/',
+    baseURL: 'https://dragan.lisa15.ru/',
+    // baseURL: 'http://localhost:7563/',
 })
 
 

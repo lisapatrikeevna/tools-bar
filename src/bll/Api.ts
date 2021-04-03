@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {groupUsersType} from "./groupReduser";
+import {UpdatedTaskType} from "./tasksReduser";
 
 const instance = axios.create({
     // baseURL: 'https://dragan.lisa15.ru/',
@@ -89,6 +90,9 @@ export type TodoslistType = {
         order: number
     }
 }
+export type taskFirebaseType={
+   [ id:string]: TaskType
+}
 export const todolistsAPI = {
     getTodolists() {
         return  instance.get<TodoslistType[]>('api/getTodolists').then(r => r.data);
@@ -117,9 +121,12 @@ export const todolistsAPI = {
        // debugger
         return instance.post<firebasePostResponseType>(`api/todoLists/add/${todolistId}/tasks`, {description,title,  status, priority, startDate, deadline, id, todolistId, order, addedDate});
     },
-
+    // addTask(todolistId: string, data:taskFirebaseType) {
+    //     debugger
+    //     return instance.post<firebasePostResponseType>(`api/todoLists/add/${todolistId}/tasks`, data);
+    // },
 //dont used
-    updateTask(todolistId: string, taskId: string, model: UpdateTaskModelType) {
+    updateTask(todolistId: string, taskId: string, model: TaskType) {
         return instance.put<ResponseType<TaskType>>(`todo-lists/${todolistId}/udateTasks/${taskId}`, model);
     },
     updateTodolist(id: string, title: string) {

@@ -19,8 +19,8 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import {mainListItems, secondaryListItems} from './listItems';
 import {Switch, Route, NavLink} from "react-router-dom"
 import Button from "@material-ui/core/Button";
-import {useDispatch} from "react-redux";
-import { signOutTC} from "../../../bll/userReduser";
+import {useDispatch, useSelector} from "react-redux";
+import {signOutTC} from "../../../bll/userReduser";
 import HomeIcon from '@material-ui/icons/Home';
 import Groups from "../../views/groups/groups";
 import {PATH} from "../../route";
@@ -29,6 +29,8 @@ import Page404 from "../../views/pages/page404/Page404";
 import GroupPage from "../../views/groups/groupPage";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import {SmallAlert} from "../common/SmalAlert";
+import {AppRootStateType} from "../../../bll/store";
+import {RequestStatusType} from "../../../bll/app-reducer";
 
 
 function Copyright() {
@@ -132,7 +134,8 @@ const GroupsUsers = React.lazy(() => import('../../views/groupUsers/groupsUsers'
 
 export default function Dashboard() {
     const dispatch = useDispatch()
-
+    // const status = useSelector<AppRootStateType, RequestStatusType>(state => state.app.status)
+    const status = useSelector(state => state.app.status)
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
     const handleDrawerOpen = () => {
@@ -180,7 +183,7 @@ export default function Dashboard() {
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.appBarSpacer}/>
-                {/*<LinearProgress/>*/}
+                {status==='loading' && <LinearProgress/>}
                 <Container maxWidth="lg" className={classes.container}>
                     <React.Suspense fallback={'...loading'}>
                         <Switch>
@@ -189,7 +192,7 @@ export default function Dashboard() {
                             <Route exact path={PATH.USERS} render={() => <Users/>}/>
                             <Route path="/starting" render={props => <Starting {...props}/>}/>
                             {/*<Route path="/groupsUsers" render={props => <GroupsUsers {...props}/>}/>*/}
-                            <Route exact path={PATH.PAGEGROUP.path} render={() => <GroupPage />}/>
+                            <Route exact path={PATH.PAGEGROUP.path} render={() => <GroupPage/>}/>
                             <Route exact path={PATH.ERROR404} render={() => <Page404/>}/>
                             {/*    /!*<Route exact path="/404" name="Page 404" render={props => <Page404 {...props}/>} />*!/*/}
                             {/*    /!*<Route exact path="/500" name="Page 500" render={props => <Page500 {...props}/>} />*!/*/}

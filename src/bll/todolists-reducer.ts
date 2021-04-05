@@ -53,6 +53,7 @@ export const setTodolistsAC = (todolists: Array<TodoslistType>) => ({type: 'SET-
 
 // thunks
 export const fetchTodolistsTC = () => {
+    debugger
     return (dispatch: ThunkDispatch) => {
         dispatch(setAppStatusAC('loading'))
         todolistsAPI.getTodolists()
@@ -87,20 +88,17 @@ export const addTodolistTC = (title: string, id: string) => (dispatch: any) => {
     let todoId = uuid.v1()
     let addedDate = new Date().toDateString()
     let order = 0
-    // debugger
     todolistsAPI.createTodolist(todoId, title, addedDate, order)
         .then((res) => {
             // console.log(res);
             dispatch(fetchTodolistsTC())
             dispatch(setAppStatusAC('succeeded'))
         })
-    todolistsAPI.createTask(todoId).then(res => {
-        dispatch(fetchTasksTC(todoId))
-        // console.log(res);
-    })
-    // debugger
+    // todolistsAPI.createTask(todoId).then(res => {
+    //     dispatch(fetchTasksTC(todoId))
+    //     // console.log(res);
+    // })
     GroupsApi.addTodoOnGroup(id, todoId).then(res => {
-        ///???????  useEffect(() => {dispatch(getGroupByIdTC(id))},[])
         dispatch(getGroupByIdTC(id))
         // console.log(res);
     })

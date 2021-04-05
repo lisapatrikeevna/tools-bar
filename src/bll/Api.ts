@@ -3,33 +3,14 @@ import {groupUsersType} from "./groupReduser";
 import {UpdatedTaskType} from "./tasksReduser";
 
 const instance = axios.create({
-    baseURL: 'https://dragan.lisa15.ru/',
-    // baseURL: 'http://localhost:7563/',
+    // baseURL: 'https://dragan.lisa15.ru/',
+    baseURL: 'http://localhost:7563/',
+})
+const instanceMg = axios.create({
+    // baseURL: 'https://dragan.lisa15.ru/',
+    baseURL: 'http://localhost:5000/',
 })
 
-
-export type GroupDataType = {
-    group: string
-    users: groupUsersType[]
-    todoLists: Array<any>
-}
-export type GroupType = {
-    data: GroupDataType
-    id: string
-}
-export type userFirestoreType = {
-    id?: string
-    name: string
-    uid: string
-    listTasks?: any
-}
-export type UserType = {
-    user: userFirestoreType
-}
-export type FireBaseResponse<T> = {
-    id: string
-    data: T
-}
 export const GroupsApi = {
     getGroups() {
         return instance.get<Array<GroupType>>('api/getGroups').then(r => r.data)
@@ -66,7 +47,8 @@ export const Users = {
     auth() {
         return instance.get('auth')
     },
-    updateUser(uid: string, payload: { email?: string, phoneNumber?: string,disabled?:false, nickName?: string }) {
+    updateUser(uid: string, payload: firestorUpdateUserType) {
+        debugger
         return instance.put(`userUpdate/${uid}`, {payload})
     },
     userRemove(uid: string) {
@@ -82,17 +64,7 @@ export const Users = {
         return instance.put(`api/deleteGroupFromUserData/${uid}`)
     },
 }
-export type TodoslistType = {
-    id: string
-    data:{
-        title: string
-        addedDate: string
-        order: number
-    }
-}
-export type taskFirebaseType={
-   [ id:string]: TaskType
-}
+
 export const todolistsAPI = {
     getTodolists() {
         return  instance.get<TodoslistType[]>('api/getTodolists').then(r => r.data);
@@ -104,41 +76,32 @@ export const todolistsAPI = {
         return instance.delete<ResponseType>(`api/deleteTodolist/${id}`);
     },
 
+
     getTasks(todolistId: string) {
-        return instance.get<GetTasksResponse>(`api/getTodolists/${todolistId}/tasks`);
+        return instanceMg.get<GetTasksResponse>(`Todolists/${todolistId}/getTasks`);
     },
-    // deleteTask(taskId: string,todolistId: string) {
-    deleteTask(todolistId: string,task: TaskType) {
-        //!!!!!!!
-        debugger
-        return instance.put<ResponseType>(`api/Todolists/${todolistId}/removeTasks`,task);
+    // deleteTask(todolistId: string, taskId: string ,task: TaskType) {
+    deleteTask(taskId: string, todolistId: string ) {
+        // return instance.put<ResponseType>(`Todolists/${todolistId}/removeTasks/${taskId}`,task);
+        return instanceMg.delete<ResponseType>(`Todolists/${todolistId}/removeTasks/${taskId}`);
     },
-    createTask(todolistId: string) {
-        // debugger
-        return instance.post<ResponseType>(`api/todoLists/create/${todolistId}/tasks`);
-    },
-    addTask(todolistId: string, { description,title, status, priority, startDate, deadline, id, todoListId, order, addedDate}:TaskType) {
-       // debugger
-        return instance.post<firebasePostResponseType>(`api/todoLists/add/${todolistId}/tasks`, {description,title,  status, priority, startDate, deadline, id, todolistId, order, addedDate});
-    },
-    // addTask(todolistId: string, data:taskFirebaseType) {
-    //     debugger
-    //     return instance.post<firebasePostResponseType>(`api/todoLists/add/${todolistId}/tasks`, data);
+    // createTask(todolistId: string) {
+    //     // debugger
+    //     return instance.post<ResponseType>(`api/todoLists/create/${todolistId}/tasks`);
     // },
-//dont used
+    addTask(todolistId: string, { description,title, status, priority, startDate, deadline, order, addedDate}:UpdatedTaskType) {
+        return instanceMg.post<any>(`Todolists/${todolistId}/addTasks`,
+            {description,title,  status, priority, startDate, deadline, todolistId, order, addedDate});
+    },
     updateTask(todolistId: string, taskId: string, model: TaskType) {
-        return instance.put<ResponseType<TaskType>>(`todo-lists/${todolistId}/udateTasks/${taskId}`, model);
+        return instanceMg.put<ResponseType>(`Todolists/${todolistId}/udateTasks/${taskId}`, model);
     },
     updateTodolist(id: string, title: string) {
-        const promise = instance.put<ResponseType>(`api/getTodolists/${id}`, {title: title});
-        return promise;
+       return  instance.put<ResponseType>(`api/getTodolists/${id}`, {title: title});
     },
 }
 export const Tasks = {
     getAllTasks() {
-        // const promise = instance.get('users');
-        // return promise;
-        // debugger
         return instance.get('users')
     },
     getGroups() {
@@ -157,6 +120,46 @@ export const Tasks = {
 }
 
 // types
+export type firestorUpdateUserType = {
+    email?: string
+    phoneNumber?: string
+    disabled?:false
+    nickName?: string
+}
+export type TodoslistType = {
+    id: string
+    data:{
+        title: string
+        addedDate: string
+        order: number
+    }
+}
+export type GroupDataType = {
+    group: string
+    users: groupUsersType[]
+    todoLists: Array<any>
+}
+export type GroupType = {
+    data: GroupDataType
+    id: string
+}
+export type userFirestoreType = {
+    id?: string
+    name: string
+    uid: string
+    listTasks?: any
+}
+export type UserType = {
+    user: userFirestoreType
+}
+export type FerebaseErrorType = {
+    code: string
+    message: string
+}
+export type FireBaseResponse<T> = {
+    id: string
+    data: T
+}
 export type LoginParamsType = {
     password: string
     email: string
@@ -197,7 +200,7 @@ export type TaskType = {
     priority: TaskPriorities
     startDate: string
     deadline: string
-    id: string
+    _id: string
     todoListId: string
     order: number
     addedDate: string
@@ -211,9 +214,9 @@ export type UpdateTaskModelType = {
     deadline: string
 }
 type GetTasksResponse = {
-    // error: string | null
-    // totalCount: number
-    // task: TaskType[]
+    error: string | null
+    totalCount: number
+    tasks: TaskType[]
 }
 type firebasePostResponseType = {
     data:string

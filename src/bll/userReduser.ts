@@ -1,8 +1,10 @@
 import {Dispatch} from "redux";
-import {FireBaseResponse, GroupsApi, GroupType, Users, UserType} from "./Api";
+import {FireBaseResponse, firestorUpdateUserType, GroupsApi, GroupType, Users, UserType} from "./Api";
 import firebase from "firebase";
 import {app} from "../index";
 import {getGroupsTC, groupUsersType, setGroupsACType} from "./groupReduser";
+import {setAppStatusAC} from "./app-reducer";
+import {handleServerNetworkError} from "../utils/error-utils";
 
 type setUsersACType = ReturnType<typeof setUsersAC>
 type authACType = ReturnType<typeof authAC>
@@ -75,7 +77,6 @@ export const userReducer = (state = initState, action: actionType) => {
                 users: state.users.map(u => {
                     const currentUser = action.payload.find((currentUser) => u.uid === currentUser.id)
                     if (currentUser) {
-                        debugger
                         const group = state.groups.find(group => group.id === currentUser.data.user.id)
                         return {
                             ...u, groupName: group?.data.group,groupId:currentUser.data.user.id, listTasks: currentUser.data.user.listTasks
@@ -113,7 +114,10 @@ export const removeUserTC = (uid: string) => (dispatch: any) => {
     Users.userRemove(uid).then(res => {
         dispatch(setUsersTC())
         console.log(res);
-    })
+    }).catch((err=>{
+            handleServerNetworkError(err, dispatch)
+        })
+    )
 }
 export const removeGroupFromUserDataTC = (uid: string) => (dispatch: any) => {
     Users.deleteGroupFromUserData(uid).then(res => {
@@ -121,11 +125,16 @@ export const removeGroupFromUserDataTC = (uid: string) => (dispatch: any) => {
         console.log(res);
     })
 }
-export const updateUserTC = (uid: string, payload: any) => (dispatch: any) => {
+export const updateUserTC = (uid: string, payload: firestorUpdateUserType) => (dispatch: any) => {
+    dispatch(setAppStatusAC('loading'))
     Users.updateUser(uid, payload).then(res => {
+        dispatch(setAppStatusAC('succeeded'))
         dispatch(setUsersTC())
         console.log(res);
-    })
+    }).catch(err=>{
+        console.log(err);
+        handleServerNetworkError(err.message, dispatch)
+        })
 }
 export const createUserTC = (email: string, password: string, username: string) => (dispatch: any) => {
     Users.createUser(email, password, username).then(res => {
@@ -155,11 +164,17 @@ export const setUserOnGroupTC = (id: string, uid: string, userName: string, user
     (dispatch: any) => {
         GroupsApi.addUserOnGroup(id, user).then(res => {
             dispatch(getGroupsTC())
-        })
+        }).catch((err=>{
+                handleServerNetworkError(err, dispatch)
+            })
+        )
         Users.addUserData(uid, id, userName).then(res => {
             // console.log("setUserOnGroupTC: ", res);
             dispatch(getAllUsersFirestoreTC())
-        })
+        }).catch((err=>{
+                handleServerNetworkError(err, dispatch)
+            })
+        )
     }
 export const loginUserTC = (email: string, password: string) => (dispatch: any) => {
     app.auth().signInWithEmailAndPassword(email, password)

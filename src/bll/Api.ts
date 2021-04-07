@@ -2,12 +2,12 @@ import axios from 'axios'
 import {groupUsersType} from "./groupReduser";
 
 const firestore = axios.create({
-    // baseURL: 'https://dragan.lisa15.ru/',
-    baseURL: 'http://localhost:7563/',
+    baseURL: 'https://dragan.lisa15.ru/',
+    // baseURL: 'http://localhost:7563/',
 })
 const mongodb = axios.create({
-    // baseURL: 'https://dragan.lisa15.ru/',
-    baseURL: 'http://localhost:5000/',
+    baseURL: 'https://mongofunction.lisa15.ru/',
+    // baseURL: 'http://localhost:5000/',
 })
 
 export const GroupsApi = {

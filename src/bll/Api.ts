@@ -1,125 +1,153 @@
 import axios from 'axios'
 import {groupUsersType} from "./groupReduser";
-import {UpdatedTaskType} from "./tasksReduser";
 
-const instance = axios.create({
+const firestore = axios.create({
     // baseURL: 'https://dragan.lisa15.ru/',
     baseURL: 'http://localhost:7563/',
 })
-const instanceMg = axios.create({
+const mongodb = axios.create({
     // baseURL: 'https://dragan.lisa15.ru/',
     baseURL: 'http://localhost:5000/',
 })
 
 export const GroupsApi = {
     getGroups() {
-        return instance.get<Array<GroupType>>('api/getGroups').then(r => r.data)
+        return firestore.get<Array<GroupType>>('api/getGroups').then(r => r.data)
     },
     addGroup(id: string, name: string) {
-        return instance.post('api/createGroup', {id, name})
+        return firestore.post<ResponseType>('api/createGroup', {id, name})
     },
     groupRemove(id: string) {
-        return instance.delete(`groupRemove/${id}`)
+        return firestore.delete<ResponseType>(`groupRemove/${id}`)
     },
     getGroupById(id: string) {
-        return instance.get(`api/getGroupById/${id}`).then(r => r.data)
+        return firestore.get(`api/getGroupById/${id}`).then(r => r.data)
     },
     addUserOnGroup(id: string, user: groupUsersType) {
-        return instance.post(`api/addUserOnGroup/${id}`, {user})
+        return firestore.post<ResponseType>(`api/addUserOnGroup/${id}`, {user})
     },
     addTodoOnGroup(id: string, todoId: string) {
-        return instance.post(`api/addTodolistsOnGroup/${id}`, {todoId})
+        return firestore.post<ResponseType>(`api/addTodolistsOnGroup/${id}`, {todoId})
     },
     removeUserFromGroup(id: string,{uid, name}: groupUsersType){
-        return instance.put(`api/deleteUserFromGroup/${id}`, {uid,name})
+        return firestore.put<ResponseType>(`api/deleteUserFromGroup/${id}`, {uid,name})
     },
     removeTodoFromGroup(id: string,todoId:string){
-        return instance.put(`api/deleteTodoListFromGroup/${id}`, {todoId})
+        return firestore.put<ResponseType>(`api/deleteTodoListFromGroup/${id}`, {todoId})
     },
 }
 export const Users = {
     getAllUsers() {
-        return instance.get('users/1')
+        //for taskReducer
+        return firestore.get('users/1')
     },
     getAllUsersFirestore() {
-        return instance.get<Array<FireBaseResponse<UserType>>>('api/getUsers').then(u => u.data)
+        return firestore.get<Array<FireBaseResponse<UserType>>>('api/getUsers').then(u => u.data)
     },
     auth() {
-        return instance.get('auth')
+        return firestore.get('auth')
     },
     updateUser(uid: string, payload: firestorUpdateUserType) {
-        debugger
-        return instance.put(`userUpdate/${uid}`, {payload})
+        return firestore.put(`userUpdate/${uid}`, {payload})
     },
     userRemove(uid: string) {
-        return instance.delete(`userRemove/${uid}`)
+        return firestore.delete(`userRemove/${uid}`)
     },
     createUser(email: string, password: string, username: string) {
-        return instance.post(`createUser`, {email, password, displayName: username})
+        return firestore.post(`createUser`, {email, password, displayName: username})
     },
     addUserData(uid: string, id: string, name: string) {
-        return instance.post(`api/addUserData`, {uid, id, name})
+        return firestore.post(`api/addUserData`, {uid, id, name})
     },
     deleteGroupFromUserData(uid: string) {
-        return instance.put(`api/deleteGroupFromUserData/${uid}`)
+        return firestore.put(`api/deleteGroupFromUserData/${uid}`)
     },
 }
 
 export const todolistsAPI = {
     getTodolists() {
-        return  instance.get<TodoslistType[]>('api/getTodolists').then(r => r.data);
+        return  firestore.get<TodoslistType[]>('api/getTodolists').then(r => r.data);
     },
     createTodolist(id:string,title:string,addedDate:string,order:number) {
-        return  instance.post<ResponseType<{ item: TodoslistType }>>('api/todoLists/create', {id,title,addedDate,order});
+        return  firestore.post<ResponseType<{ item: TodoslistType }>>('api/todoLists/create', {id,title,addedDate,order});
     },
     deleteTodolist(id: string) {
-        return instance.delete<ResponseType>(`api/deleteTodolist/${id}`);
+        return firestore.delete<ResponseType>(`api/deleteTodolist/${id}`);
+    },
+    updateTodolist(id: string, title: string) {
+        return  firestore.put<ResponseType>(`api/getTodolists/${id}`, {title: title});
     },
 
 
     getTasks(todolistId: string) {
-        return instanceMg.get<GetTasksResponse>(`Todolists/${todolistId}/getTasks`);
+        return mongodb.get<GetTasksResponse>(`Todolists/${todolistId}/getTasks`);
     },
     // deleteTask(todolistId: string, taskId: string ,task: TaskType) {
-    deleteTask(taskId: string, todolistId: string ) {
-        // return instance.put<ResponseType>(`Todolists/${todolistId}/removeTasks/${taskId}`,task);
-        return instanceMg.delete<ResponseType>(`Todolists/${todolistId}/removeTasks/${taskId}`);
+    deleteTask( todolistId: string ) {
+        debugger
+        // return firestore.put<ResponseType>(`Todolists/${todolistId}/removeTasks/${taskId}`,task);
+        return mongodb.delete<ResponseType>(`Todolists/${todolistId}/removeTasks`);
     },
     // createTask(todolistId: string) {
     //     // debugger
-    //     return instance.post<ResponseType>(`api/todoLists/create/${todolistId}/tasks`);
+    //     return firestore.post<ResponseType>(`api/todoLists/create/${todolistId}/tasks`);
     // },
-    addTask(todolistId: string, { description,title, status, priority, startDate, deadline, order, addedDate}:UpdatedTaskType) {
-        return instanceMg.post<any>(`Todolists/${todolistId}/addTasks`,
-            {description,title,  status, priority, startDate, deadline, todolistId, order, addedDate});
+    addTask(todolistId: string, { description,title, status, priority, startDate, deadline, order, addedDate,completed,_id}:TaskType) {
+        return mongodb.post<ResponseType>(`Todolists/${todolistId}/addTask`,
+            {description,title,  status, priority, startDate, deadline, todolistId, order, addedDate,completed,_id});
     },
     updateTask(todolistId: string, taskId: string, model: TaskType) {
-        return instanceMg.put<ResponseType>(`Todolists/${todolistId}/udateTasks/${taskId}`, model);
+        return mongodb.put<ResponseType>(`Todolists/${todolistId}/udateTasks/${taskId}`, model);
     },
-    updateTodolist(id: string, title: string) {
-       return  instance.put<ResponseType>(`api/getTodolists/${id}`, {title: title});
-    },
+
 }
 export const Tasks = {
     getAllTasks() {
-        return instance.get('users')
+        return firestore.get('users')
     },
     getGroups() {
-        // const promise = instance.get('users');
+        // const promise = firestore.get('users');
         // return promise;
         // debugger
-        return instance.get('api/get')
+        return firestore.get('api/get')
     },
     addTodo(id: string, name: string) {
         debugger
-        return instance.post('api/todoLists/create', {id, name})
+        return firestore.post('api/todoLists/create', {id, name})
     },
     taskRemove(id:string){
-        return instance.delete(`taskRemove/${id}`)
+        return mongodb.delete(`taskRemove/${id}`)
     }
 }
 
 // types
+
+export type TaskType = {
+    description: string
+    title: string
+    status: TaskStatuses
+    priority: TaskPriorities
+    startDate: string
+    deadline: string
+    _id: string
+    todoListId: string
+    order: number
+    addedDate: string
+    completed: boolean
+}
+export type UpdateTaskModelType = {
+    title: string
+    description: string
+    status: TaskStatuses
+    priority: TaskPriorities
+    startDate: string
+    deadline: string
+}
+type GetTasksResponse = {
+    error: string | null
+    totalCount: number
+    tasks: TaskType[]
+}
 export type firestorUpdateUserType = {
     email?: string
     phoneNumber?: string
@@ -137,7 +165,7 @@ export type TodoslistType = {
 export type GroupDataType = {
     group: string
     users: groupUsersType[]
-    todoLists: Array<any>
+    todoLists: Array<string>
 }
 export type GroupType = {
     data: GroupDataType
@@ -170,21 +198,17 @@ export type myResponseType = {
     email: string
     login: string
 }
-
 export type ResponseType<D = {}> = {
-    // resultCode: number
-    messages: Array<string>
-    fieldsErrors: Array<string>
+    status: number
+    messages: string
     data?: D
 }
-
 export enum TaskStatuses {
     New = 0,
     InProgress = 1,
     Completed = 2,
     Draft = 3
 }
-
 export enum TaskPriorities {
     Low = 0,
     Middle = 1,
@@ -192,88 +216,9 @@ export enum TaskPriorities {
     Urgently = 3,
     Later = 4
 }
-
-export type TaskType = {
-    description: string
-    title: string
-    status: TaskStatuses
-    priority: TaskPriorities
-    startDate: string
-    deadline: string
-    _id: string
-    todoListId: string
-    order: number
-    addedDate: string
-}
-export type UpdateTaskModelType = {
-    title: string
-    description: string
-    status: TaskStatuses
-    priority: TaskPriorities
-    startDate: string
-    deadline: string
-}
-type GetTasksResponse = {
-    error: string | null
-    totalCount: number
-    tasks: TaskType[]
-}
 type firebasePostResponseType = {
     data:string
     status:number
     statusText:string
 }
-//import * as admin from 'firebase-admin';
-//const serviceAccount = require("../fir-silky-firebase-adminsdk-6l12p-2bc5e41df4.json");
 
-//const app = admin.initializeApp();
-// admin.initializeApp({
-//     credential: admin.credential.applicationDefault(),
-//   //credential: admin.credential.cert(serviceAccount),
-//   databaseURL: "https://fir-silky-default-rtdb.europe-west1.firebasedatabase.app"
-// });
-// const adminId = 'lisa-fox'
-// admin.auth().createCustomToken(adminId)
-//     .then((customToken)=>{
-//       console.log(customToken);
-//     })
-//     .catch((error)=>{
-//       console.log(error);
-//     })
-
-//https://firebase.google.com/docs/cloud-messaging/auth-server
-//!!!!! https://firebase.google.com/docs/auth/admin/manage-users
-//https://firebase.google.com/docs/database/admin/start/?hl=ru-ru#node.js
-// export const listAllUsers = (nextPageToken) => {
-//   // List batch of users, 1000 at a time.
-//   admin
-//       .auth()
-//       .listUsers(1000, nextPageToken)
-//       .then((listUsersResult) => {
-//           debugger
-//         listUsersResult.users.forEach((userRecord) => {
-//           console.log('users', userRecord.toJSON());
-//         });
-//         if (listUsersResult.pageToken) {
-//           // List next batch of users.
-//           listAllUsers(listUsersResult.pageToken);
-//         }
-//       })
-//       .catch((error) => {
-//         console.log('Error listing users:', error);
-//       });
-//};
-// Start listing users from the beginning, 1000 at a time.
-//listAllUsers();
-//delet "firebase": "^8.2.6",
-
-//const serviceAccount = require("path/to/serviceAccountKey.json");
-// export const firebaseConfig={
-//   apiKey: "AIzaSyDGqV4nDHMokspRbNj9OufL531PwdNB2sc",
-//   authDomain: "fir-silky.firebaseapp.com",
-//   databaseURL: "https://fir-silky-default-rtdb.europe-west1.firebasedatabase.app",
-//   projectId: "fir-silky",
-//   storageBucket: "fir-silky.appspot.com",
-//   messagingSenderId: "459950163847",
-//   appId: "1:459950163847:web:2f94e0b34b0c77d10cb522"
-// }

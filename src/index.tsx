@@ -20,13 +20,11 @@ export const app=firebase.initializeApp({
     appId: "1:459950163847:web:bcbb780902e981920cb522"
 })
 ReactDOM.render(
-    <React.StrictMode>
         <Provider store={store}>
             <HashRouter>
             <App/>
             </HashRouter>
-        </Provider>
-    </React.StrictMode>,
+        </Provider>,
   document.getElementById('root')
 );
 

@@ -1,10 +1,11 @@
 import {Dispatch} from "redux";
-import {TaskPriorities, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelType, Users} from "./Api";
+import {TaskPriorities, Tasks, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelType, Users} from "./Api";
 import {RemoveTodolistActionType, SetTodolistsActionType} from "./todolists-reducer";
 import {SetAppErrorActionType, setAppStatusAC, SetAppStatusActionType} from "./app-reducer";
 import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
 import * as uuid from "uuid";
 import {AppRootStateType} from "./store";
+import { v1 } from "uuid";
 
 
 export type UpdatedTaskType = {
@@ -46,7 +47,6 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
             }
         }
         case 'UPDATE-TASK':
-            debugger
             return {
                 ...state,
                 [action.todolistId]: state[action.todolistId]
@@ -64,7 +64,6 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
             return copyState
         }
         case 'SET-TASKS':
-            debugger
             return {...state, [action.todolistId]: action.tasks}
         default:
             return state
@@ -97,7 +96,7 @@ export const fetchTasksTC = (todolistId: string) => (dispatch: Dispatch<ActionsT
 export const removeTaskTC = (taskId: string, todolistId: string) => (dispatch: Dispatch<ActionsType| SetAppErrorActionType | SetAppStatusActionType >) => {
     dispatch(setAppStatusAC('loading'))
     // todolistsAPI.deleteTask(todolistId, taskId, task)
-        todolistsAPI.deleteTask(taskId,todolistId)
+    Tasks.taskRemove(taskId)
         .then(res => {
             if (res.status === 200) {
                 dispatch(removeTaskAC(taskId, todolistId))
@@ -111,6 +110,7 @@ export const removeTaskTC = (taskId: string, todolistId: string) => (dispatch: D
 }
 export const addTaskTC = (title: string, todoListId: string) => (dispatch: Dispatch<ActionsType | SetAppErrorActionType | SetAppStatusActionType | any> ) => {
     dispatch(setAppStatusAC('loading'))
+    let _id = v1();
     let description = '';
     let completed = false;
     let status = 0;
@@ -119,13 +119,17 @@ export const addTaskTC = (title: string, todoListId: string) => (dispatch: Dispa
     let deadline = new Date().toDateString() //required(datetime)
     let order = 0;// required(integer)
     let addedDate = new Date().toDateString()
+    const task = {
+        description, title, status, priority, startDate, deadline,
+        todoListId, order, addedDate, completed, _id
+    }
     todolistsAPI.addTask(todoListId, {
         description, title, status, priority, startDate, deadline,
-        todoListId, order, addedDate
+        todoListId, order, addedDate,completed,_id
     })
         .then(res => {
             if (res.status === 200) {
-                dispatch(fetchTasksTC(todoListId))
+                dispatch(addTaskAC(task))
                 dispatch(setAppStatusAC('succeeded'))
             } else {
                 // handleServerAppError(, dispatch);
@@ -155,6 +159,7 @@ export const updateTaskTC = (taskId: string, updatedTask: UpdatedTaskType, todol
             todoListId: task.todoListId,
             order: task.order,
             addedDate: task.addedDate,
+            completed: task.completed,
             ...updatedTask
         }
 

@@ -9,11 +9,11 @@ import {authReducer} from "./authReducer";
 import { groupReducer } from './groupReduser';
 
 const rootReducer = combineReducers({
+    todoList: todolistsReducer,
     groups: groupReducer,
     users: userReducer,
     nav: changeStateReducer,
     tasks: tasksReducer,
-    todoList: todolistsReducer,
     app: appReducer,
     auth: authReducer,
 });
